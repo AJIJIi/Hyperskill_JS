@@ -1,0 +1,69 @@
+const input = require('sync-input');
+
+const currencies = ['USD', 'JPY', 'EUR', 'RUB', 'GBP']
+const ratesToUSD = [1, 113.5, 0.89, 74.36, 0.75]
+const actions = ['Convert currencies', 'Exit program']
+
+const unkownCurrencyMessage = 'Unknown currency';
+
+console.log('Welcome to Currency Converter!');
+
+for (i = 0; i < currencies.length; i++) {
+  console.log(`1 USD equals ${ratesToUSD[i]} ${currencies[i]}`);
+}
+
+while (true) {
+  console.log('What do you want to do?');
+
+  let actionsMessage = '';
+  for (index in actions) {
+    actionsMessage += `${Number(index) + 1}-${actions[index]}`;
+    if (index != actions.length - 1) {
+      actionsMessage += ' ';
+    }
+  }
+  console.log(actionsMessage);
+  
+  const actionIndex = Number(input());
+  const action = actions[actionIndex - 1];
+  if (typeof action == 'string') {
+    if (action == 'Convert currencies') {
+      while (true) {
+        console.log('What do you want to convert?');
+      
+        let currencyToChangeFrom = String(input('From: '));
+        currencyToChangeFrom = currencyToChangeFrom.toUpperCase();
+        let currencyToChangeFromIndex = currencies.indexOf(currencyToChangeFrom);
+        if (currencyToChangeFromIndex == -1) {
+          console.log(unkownCurrencyMessage);
+          continue;
+        }
+
+        let currencyToChangeTo = String(input('To: '));
+        currencyToChangeTo = currencyToChangeTo.toUpperCase();
+        let currencyToChangeToIndex = currencies.indexOf(currencyToChangeTo);
+        if (currencyToChangeToIndex == -1) {
+          console.log(unkownCurrencyMessage);
+          continue;
+        }
+ 
+        const amountToChange = Number(input('Amount: '));
+        if (isNaN(amountToChange)) {
+          console.log('The amount has to be a number');
+          break;
+        } else if (amountToChange < 1) {
+          console.log('The amount cannot be less than 1');
+          break;
+        } else {
+          console.log(`Result: ${amountToChange} ${currencyToChangeFrom} equals ${(amountToChange / ratesToUSD[currencyToChangeFromIndex] * ratesToUSD[currencyToChangeToIndex]).toFixed(4)} ${currencyToChangeTo}`);
+          break;
+        }
+      }
+    } else if (action == 'Exit program') {
+      console.log('Have a nice day!');
+      break;
+    }
+  } else {
+    console.log('Unknown input');
+  }
+}
