@@ -1,0 +1,80 @@
+function getRandomElement(array) {
+  let index = Math.floor(Math.random() * array.length);
+  return array[index];
+}
+
+const input = require('sync-input');
+const words = ['python', 'java', 'swift', 'javascript'];
+const actions = ['play', 'results', 'exit'];
+let winCount = 0;
+let lostCount = 0;
+let livesCount = 8;
+
+console.log('H A N G M A N');
+let action = "";
+
+while (true) {
+  while (!actions.includes(action)) {
+    action = input('Type "play" to play the game, "results" to show the scoreboard, and "exit" to quit: ');
+  }
+
+  if (action == 'results') {
+    console.log(`You won: ${winCount} times`);
+    console.log(`You lost: ${lostCount} times`);
+  } else if (action == 'exit') {
+    break;
+  } else {
+    const chosenWord = getRandomElement(words);
+    let guessedWord = '-'.repeat(chosenWord.length);
+    let guessedLetters = [];
+
+    while (true) {
+      console.log();
+      console.log(guessedWord);
+
+      if (guessedWord == chosenWord) {
+        break;
+      }
+
+      const newLetter = input('Input a letter: ');
+
+      if (newLetter.length > 1 || newLetter.length == 0) {
+        console.log("Please, input a single letter");
+        continue;
+      } else if ((!/[a-z]/.test(newLetter))) {
+        console.log("Please, enter a lowercase letter from the English alphabet");
+        continue;
+      } else if (guessedLetters.includes(newLetter)) {
+        console.log("You've already guessed this letter");
+        continue;
+      } else {
+        guessedLetters.push(newLetter);
+        if (chosenWord.includes(newLetter)) {
+          for (index = 0; index < chosenWord.length; index++) {
+            if (chosenWord[index] === newLetter) {
+              guessedWord = guessedWord.slice(0, index) + newLetter + guessedWord.slice(index + 1);
+            }
+          }
+        } else {
+          console.log("That letter doesn't appear in the word");
+          livesCount -= 1;
+          if (livesCount == 0) {
+            break;
+          }
+        }
+      }
+    }
+
+    if (livesCount > 0) {
+      console.log(`You guessed the word ${chosenWord}!`);
+      console.log('You survived!');
+      winCount += 1;
+    } else {
+      console.log();
+      console.log('You lost!');
+      lostCount += 1;
+      
+    }
+  }
+  action = '';
+}
