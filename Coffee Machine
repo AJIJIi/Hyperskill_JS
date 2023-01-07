@@ -1,0 +1,95 @@
+const input = require('sync-input');
+
+const parts = [["water", "ml"], ["milk", "ml"], ["coffee beans", "g"], ["disposable cups"], ["money", "$"]];
+let bank = [400, 540, 120, 9, 550];
+const actions = ["buy", "fill", "take", "remaining", "exit"];
+const drinks = [["espresso", 250, 0, 16, 1, -4], ["latte", 350, 75, 20, 1, -7], ["cappuccino", 200, 100, 12, 1, -6]];
+
+function logBankDescription() {
+  console.log("The coffee machine has:");
+  for (index in parts) {
+    if (parts[index][0] == "money") {
+      console.log(`${parts[index][1]}${bank[index]} of ${parts[index][0]}`);
+    } else if (typeof parts[index][1] == "undefined") {
+      console.log(`${bank[index]} ${parts[index][0]}`);
+    } else {
+      console.log(`${bank[index]} ${parts[index][1]} of ${parts[index][0]}`);
+   }
+  }
+}
+
+let actionsDescription = "Write action (";
+for (index in actions) {
+  actionsDescription += actions[index];
+  if (index != actions.length - 1) {
+    actionsDescription += ", ";
+  }
+}
+actionsDescription += "):";
+
+let shouldExit = false;
+while (!shouldExit) {
+  console.log(actionsDescription);
+  const action = input();
+  console.log();
+  switch(action) {
+    case actions[0]:
+      let drinkAsk = "What do you want to buy? ";
+      for (index in drinks) {
+        drinkAsk += `${Number(index) + 1} - ${drinks[index][0]}, `;
+      }
+      drinkAsk += "back - to main menu:";
+      console.log(drinkAsk);
+      let drinkIndex = input();
+      if (drinkIndex == "back") {
+        console.log();
+        break;
+      } else {
+        drinkIndex = Number(drinkIndex) - 1;
+        let missingPartIndex = -1;
+        for (index = 1; index < drinks[drinkIndex].length - 1; index++) {
+          if (bank[index - 1] < drinks[drinkIndex][index]) {
+            missingPartIndex = index - 1;
+            break;
+          }
+        }
+        if (missingPartIndex == -1) {
+          for (index = 1; index < drinks[drinkIndex].length; index++) {
+            bank[index - 1] -= drinks[drinkIndex][index];
+          }
+          console.log("I have enough resources, making you a coffee!");
+        } else {
+          console.log(`Sorry, not enough ${parts[missingPartIndex][0]}!`);
+        }
+        console.log();
+        break;
+      }
+    case actions[1]:
+      for (index = 0; index < parts.length - 1; index++) {
+        let partAsk = "Write how many ";
+        if (typeof parts[index][1] != "undefined") {
+          partAsk += `${parts[index][1]} of `;
+        }
+        partAsk += `${parts[index][0]} you want to add:`;
+        console.log(partAsk);
+        const partSpend = Number(input());
+        bank[index] += partSpend;
+      }
+      console.log();
+      break;
+    case actions[2]:
+      const moneyIndex = parts.length - 1;
+      console.log(`I gave you ${parts[moneyIndex][1]}${bank[moneyIndex]}`);
+      bank[moneyIndex] = 0;
+      console.log();
+      break;
+    case actions[3]:
+      logBankDescription();
+      console.log();
+      break;
+    case actions[4]:
+      shouldExit = true;
+      break;
+    default:
+  }
+}
